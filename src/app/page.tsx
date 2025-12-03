@@ -1,65 +1,155 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import { Search, Loader2, X, MoveRight } from "lucide-react";
+
+// Tipe data (sesuai output Backend Neo4j kamu)
+interface SearchResult {
+  id: number;
+  type: string;
+  label: string;
+  score: number;
+  details: {
+    artist_name_raw?: string;
+    url?: string;
+    bio?: string;
+    nationality?: string;
+    title?: string;
+    genre?: string;
+    years?: string;
+  };
+}
 
 export default function Home() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Efek transisi halus saat loading
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!query.trim()) return;
+
+    setLoading(true);
+    setHasSearched(true);
+    setResults([]); 
+
+    try {
+      const res = await fetch(`http://localhost:8000/search?q=${query}`);
+      const data = await res.json();
+      setResults(data.results || []);
+    } catch (error) {
+      console.error("Connection Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen flex flex-col items-center px-6 py-12 md:py-20 bg-stone-50 text-stone-900">
+      
+      {/* --- HERO SECTION --- */}
+      <div className={`transition-all duration-700 ease-in-out flex flex-col items-center w-full max-w-4xl ${hasSearched ? "mt-0 mb-12" : "mt-[25vh]"}`}>
+        
+        {/* Brand Name */}
+        <h1 className="font-serif text-6xl md:text-8xl font-medium tracking-tighter mb-2 text-stone-900">
+          Curator<span className="text-stone-400">.</span>
+        </h1>
+        
+        <p className={`font-cormorant text-2xl text-stone-500 mb-10 text-center font-light italic transition-opacity duration-500 ${hasSearched ? "opacity-0 h-0 overflow-hidden" : "opacity-100"}`}>
+          "Every canvas is a journey through time."
+        </p>
+
+        {/* Minimalist Search Bar */}
+        <form onSubmit={handleSearch} className="relative w-full max-w-xl group">
+          <input
+            type="text"
+            placeholder="Search artists, movements, or artworks..."
+            className="w-full bg-transparent border-b-2 border-stone-300 py-3 text-2xl font-serif placeholder:text-stone-300 text-stone-800 focus:outline-none focus:border-stone-800 transition-colors"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button 
+            type="submit"
+            className="absolute right-0 top-3 text-stone-400 group-hover:text-stone-800 transition-colors"
+            disabled={loading}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {loading ? <Loader2 className="animate-spin w-6 h-6" /> : <MoveRight className="w-6 h-6" />}
+          </button>
+        </form>
+
+        {/* Tags rekomendasi (Hanya muncul sebelum search) */}
+        {!hasSearched && (
+           <div className="mt-6 flex gap-3 text-sm text-stone-400 font-sans">
+             <span>Try:</span>
+             <button onClick={() => {setQuery("Monet");}} className="hover:text-stone-800 hover:underline">Monet</button>
+             <button onClick={() => {setQuery("Portrait");}} className="hover:text-stone-800 hover:underline">Portrait</button>
+             <button onClick={() => {setQuery("Renaissance");}} className="hover:text-stone-800 hover:underline">Renaissance</button>
+           </div>
+        )}
+      </div>
+
+      {/* --- GALLERY GRID --- */}
+      <div className="w-full max-w-[1600px] animate-in fade-in slide-in-from-bottom-10 duration-1000">
+        
+        {/* No Results Message */}
+        {hasSearched && !loading && results.length === 0 && (
+          <div className="text-center py-20 border-t border-stone-200">
+            <p className="font-serif text-3xl text-stone-300 italic">No artifacts found.</p>
+            <p className="font-sans text-stone-400 mt-2">Try searching for "Picasso" or "Landscape"</p>
+          </div>
+        )}
+
+        {/* Masonry Layout */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+          {results.map((item, index) => (
+            <div 
+              key={`${item.id}-${index}`} 
+              className="break-inside-avoid bg-white p-4 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer group border border-stone-100"
+            >
+              {/* IMAGE (Khusus Artwork) */}
+              {item.type === "Artwork" && item.details.url && (
+                <div className="relative overflow-hidden bg-stone-100 mb-4 aspect-auto">
+                   <img 
+                      src={item.details.url} 
+                      alt={item.label}
+                      className="w-full h-auto object-cover filter sepia-[0.2] group-hover:sepia-0 transition-all duration-700"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                   />
+                </div>
+              )}
+
+              {/* CARD INFO */}
+              <div className="flex flex-col gap-1">
+                {/* Type Label (Kecil di atas) */}
+                <span className="text-[10px] uppercase tracking-[0.2em] text-stone-400 font-sans">
+                  {item.type === 'Artist' ? 'Artist Profile' : 'Masterpiece'}
+                </span>
+
+                {/* Judul Utama */}
+                <h3 className="font-serif text-xl font-medium text-stone-900 leading-tight group-hover:underline decoration-1 underline-offset-4">
+                  {item.label}
+                </h3>
+
+                {/* Subtitle (Nama Artis atau Kebangsaan) */}
+                <p className="font-cormorant text-lg text-stone-500 italic">
+                   {item.type === "Artwork" ? item.details.artist_name_raw : item.details.nationality}
+                </p>
+
+                {/* Artist Bio Snippet */}
+                {item.type === "Artist" && item.details.bio && (
+                  <p className="mt-4 text-xs font-sans text-stone-500 leading-relaxed line-clamp-4 border-l border-stone-300 pl-3">
+                    {item.details.bio}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
