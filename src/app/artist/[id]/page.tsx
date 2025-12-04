@@ -32,7 +32,7 @@ export default function ArtistPage() {
   useEffect(() => {
     if (!id) return;
     const artistName = decodeURIComponent(id as string);
-    fetch(`http://localhost:8000/artist/${encodeURIComponent(artistName)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/artist/${encodeURIComponent(artistName)}`)
       .then((res) => {
          if(!res.ok) throw new Error("Artist not found");
          return res.json();

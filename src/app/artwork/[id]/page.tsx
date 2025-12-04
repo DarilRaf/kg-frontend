@@ -38,7 +38,7 @@ export default function ArtworkPage() {
     if (!id) return;
     // Reset state saat id berubah (penting buat navigasi antar rekomendasi)
     setLoading(true);
-    fetch(`http://localhost:8000/artwork/${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/artwork/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Gagal mengambil data");
         return res.json();

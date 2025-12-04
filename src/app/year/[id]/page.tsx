@@ -10,7 +10,7 @@ export default function YearPage() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`http://localhost:8000/year/${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/year/${id}`)
       .then(res => res.json())
       .then(setData)
       .catch(console.error);

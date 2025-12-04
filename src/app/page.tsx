@@ -41,7 +41,7 @@ function SearchContent() {
     setResults([]);
 
     try {
-      const res = await fetch(`http://localhost:8000/search?q=${searchTerm}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/search?q=${searchTerm}`);
       const data = await res.json();
       setResults(data.results || []);
     } catch (error) {

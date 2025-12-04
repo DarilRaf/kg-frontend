@@ -11,7 +11,7 @@ export default function LocationPage() {
   useEffect(() => {
     if (!name) return;
     const locName = decodeURIComponent(name as string);
-    fetch(`http://localhost:8000/location/${encodeURIComponent(locName)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/location/${encodeURIComponent(locName)}`)
       .then(res => res.json())
       .then(setData)
       .catch(console.error);

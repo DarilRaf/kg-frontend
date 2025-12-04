@@ -11,7 +11,7 @@ export default function MovementPage() {
   useEffect(() => {
     if (!name) return;
     const moveName = decodeURIComponent(name as string);
-    fetch(`http://localhost:8000/movement/${encodeURIComponent(moveName)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/movement/${encodeURIComponent(moveName)}`)
       .then(res => res.json())
       .then(setData)
       .catch(console.error);
