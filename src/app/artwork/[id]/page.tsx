@@ -74,12 +74,25 @@ export default function ArtworkPage() {
                 {data.artwork.title}
             </h1>
 
-            {/* NEW: SPECIFICATIONS LIST */}
+            {/* SPECIFICATIONS LIST */}
             <div className="space-y-4 border-t border-[#C6A87C]/30 pt-6">
+                
+                {/* YEAR (UPDATE: Clickable) */}
                 <div className="flex items-center gap-3 text-stone-600">
                     <Calendar className="w-5 h-5 text-[#C6A87C]" />
-                    <span className="font-serif text-lg">{data.artwork.year}</span>
+                    <span 
+                        onClick={() => {
+                            // Cek kalau tahunnya angka valid (bukan 'Unknown Year')
+                            if (data.artwork.year && !isNaN(parseInt(data.artwork.year))) {
+                                router.push(`/year/${data.artwork.year}`);
+                            }
+                        }}
+                        className={`font-serif text-lg ${!isNaN(parseInt(data.artwork.year)) ? "cursor-pointer hover:text-[#C6A87C] hover:underline decoration-stone-400 underline-offset-4 transition-colors" : ""}`}
+                    >
+                        {data.artwork.year}
+                    </span>
                 </div>
+
                 <div className="flex items-center gap-3 text-stone-600">
                     <Paintbrush className="w-5 h-5 text-[#C6A87C]" />
                     <span className="font-serif text-lg capitalize">{data.artwork.medium}</span>
@@ -88,10 +101,13 @@ export default function ArtworkPage() {
                     <Ruler className="w-5 h-5 text-[#C6A87C]" />
                     <span className="font-serif text-lg">{data.artwork.dimensions}</span>
                 </div>
-                <div className="flex items-center gap-3 text-stone-600">
-                    <MapPin className="w-5 h-5 text-[#C6A87C]" />
-                    <span className="font-serif text-lg italic">{data.artwork.location}</span>
-                </div>
+                {/* LOCATION (UPDATE: Clickable if Base/Location page exists) */}
+                {data.artwork.location && data.artwork.location !== "Unknown Location" && (
+                    <div className="flex items-center gap-3 text-stone-600">
+                        <MapPin className="w-5 h-5 text-[#C6A87C]" />
+                        <span className="font-serif text-lg italic">{data.artwork.location}</span>
+                    </div>
+                )}
             </div>
         </div>
 

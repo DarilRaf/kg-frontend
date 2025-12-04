@@ -8,7 +8,7 @@ interface ArtistDetail {
   name: string;
   bio: string;
   nationality: string;
-  base?: string; // Field baru
+  base?: string;
   birth_year?: number;
   death_year?: number;
   period?: string;
@@ -62,42 +62,76 @@ export default function ArtistPage() {
         <h1 className="font-serif text-6xl md:text-8xl font-bold mb-6 leading-none">{artist.name}</h1>
         
         {/* INFO BADGES */}
-        <div className="flex flex-wrap gap-4 mb-8">
-            {/* Nationality: German, Italian */}
+        <div className="flex flex-wrap gap-4 mb-8 select-none">
+            
+            {/* Nationality */}
             {artist.nationality && (
-                <span className="px-3 py-1 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2">
+                <span className="px-4 py-2 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2 cursor-default">
                     <Globe className="w-4 h-4 text-stone-500" />
                     {artist.nationality}
                 </span>
             )}
             
-            {/* Base: Germany, Rome, Paris */}
+            {/* Base Location */}
             {artist.base && (
-                <span className="px-3 py-1 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-stone-500" />
-                    {artist.base}
-                </span>
+                <div 
+                    onClick={() => router.push(`/location/${encodeURIComponent(artist.base!)}`)}
+                    className="px-4 py-2 bg-[#E5E0D8] hover:bg-[#d6d3d1] hover:shadow-sm active:scale-95 transition-all cursor-pointer rounded-full text-sm font-medium flex items-center gap-2 group"
+                >
+                    <MapPin className="w-4 h-4 text-stone-500 group-hover:text-[#C6A87C] transition-colors" />
+                    <span className="group-hover:underline decoration-stone-400 underline-offset-2">{artist.base}</span>
+                </div>
             )}
 
-            {/* Years */}
+            {/* YEARS (UPDATE: Clickable Birth/Death) */}
             {(artist.birth_year || artist.death_year) && (
-                <span className="px-3 py-1 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2">
+                <div className="px-4 py-2 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2 cursor-default">
                     <Hourglass className="w-4 h-4 text-stone-500" />
-                    {artist.birth_year || '?'} — {artist.death_year || '?'}
-                </span>
+                    
+                    {/* Birth Year Link */}
+                    <span 
+                        onClick={(e) => {
+                            if(artist.birth_year) {
+                                e.stopPropagation();
+                                router.push(`/year/${artist.birth_year}`);
+                            }
+                        }}
+                        className={artist.birth_year ? "cursor-pointer hover:text-[#C6A87C] hover:underline decoration-stone-400 underline-offset-2 transition-colors" : ""}
+                    >
+                        {artist.birth_year || '?'}
+                    </span>
+                    
+                    <span>—</span>
+                    
+                    {/* Death Year Link */}
+                    <span 
+                        onClick={(e) => {
+                            if(artist.death_year) {
+                                e.stopPropagation();
+                                router.push(`/year/${artist.death_year}`);
+                            }
+                        }}
+                        className={artist.death_year ? "cursor-pointer hover:text-[#C6A87C] hover:underline decoration-stone-400 underline-offset-2 transition-colors" : ""}
+                    >
+                        {artist.death_year || '?'}
+                    </span>
+                </div>
             )}
 
             {/* Period */}
             {artist.period && (
-                <span className="px-3 py-1 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2">
-                    <Brush className="w-4 h-4 text-stone-500" />
-                    {artist.period}
-                </span>
+                <div 
+                    onClick={() => router.push(`/movement/${encodeURIComponent(artist.period!)}`)}
+                    className="px-4 py-2 bg-[#E5E0D8] hover:bg-[#d6d3d1] hover:shadow-sm active:scale-95 transition-all cursor-pointer rounded-full text-sm font-medium flex items-center gap-2 group"
+                >
+                    <Brush className="w-4 h-4 text-stone-500 group-hover:text-[#C6A87C] transition-colors" />
+                    <span className="group-hover:underline decoration-stone-400 underline-offset-2">{artist.period}</span>
+                </div>
             )}
 
             {/* School */}
             {artist.school && (
-                <span className="px-3 py-1 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2">
+                <span className="px-4 py-2 bg-[#E5E0D8] rounded-full text-sm font-medium flex items-center gap-2 cursor-default">
                     <Landmark className="w-4 h-4 text-stone-500" />
                     {artist.school}
                 </span>
@@ -111,13 +145,13 @@ export default function ArtistPage() {
         </div>
       </div>
 
-      {/* GALLERY (Sama seperti sebelumnya) */}
+      {/* GALLERY */}
       <div className="px-6 md:px-20 max-w-[1800px] mx-auto">
         <h2 className="font-serif text-4xl mb-10 flex items-center gap-4">
           <Palette className="w-8 h-8 text-[#C6A87C]" />
           Known Works <span className="text-lg text-stone-400 font-sans font-normal">({artist.artworks.length})</span>
         </h2>
-        {/* ... (Gallery code sama) ... */}
+
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {artist.artworks.map((work) => (
             <div 
